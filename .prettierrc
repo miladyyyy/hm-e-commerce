@@ -1,0 +1,6 @@
+{
+  "semi": false,
+  "singleQuote": true,
+  "eslint.autoFixOnSave": true,
+  "editor.formatOnSave": true
+}
