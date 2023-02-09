@@ -26,7 +26,6 @@ request.interceptors.response.use(
     }
   },
   function (error) {
-    Message.error(error?.response?.data?.message || '系统错误')
     return Promise.reject(error)
   }
   // function (error) {

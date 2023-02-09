@@ -2,6 +2,7 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import LoginPage from '@/views/Login'
 import LayoutPage from '@/views/Layout'
+import store from '@/store'
 
 Vue.use(VueRouter)
 
@@ -59,6 +60,12 @@ const routes = [
 
 const router = new VueRouter({
   routes,
+})
+
+router.beforeEach((to, from, next) => {
+  const { token } = store.state.user
+  if (to.path !== '/login' && !token) return next('/login')
+  next()
 })
 
 export default router
