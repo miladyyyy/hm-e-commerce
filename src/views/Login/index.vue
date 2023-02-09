@@ -63,9 +63,10 @@ export default {
   },
   methods: {
     async login() {
-      const { data } = await loginAPI(this.form)
+      await this.$refs.form.validate()
+      const res = await loginAPI(this.form)
       this.$message.success('登录成功！')
-      this.$store.commit('user/setToken', data.token)
+      this.$store.commit('user/setToken', res.data.token)
       this.$router.push('/welcome')
     },
   },

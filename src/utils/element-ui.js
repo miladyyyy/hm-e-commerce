@@ -33,6 +33,7 @@ import {
   Submenu,
   MenuItemGroup,
   Switch,
+  Select,
 } from 'element-ui'
 
 Vue.use(Breadcrumb)
@@ -65,6 +66,7 @@ Vue.use(Link)
 Vue.use(Image)
 Vue.use(Submenu)
 Vue.use(Switch)
+Vue.use(Select)
 
 Vue.use(Loading.directive)
 

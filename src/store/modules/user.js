@@ -1,4 +1,4 @@
-import { setToken, getToken } from '@/utils/storage'
+import { setToken, getToken, removeToken } from '@/utils/storage'
 
 const user = {
   namespaced: true,
@@ -9,6 +9,10 @@ const user = {
     setToken(state, newToken) {
       state.token = newToken
       setToken(newToken)
+    },
+    removeToken(state) {
+      state.token = ''
+      removeToken()
     },
   },
   actions: {},

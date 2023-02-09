@@ -5,7 +5,7 @@
         <div class="header-log">
           <img src="@/assets/images/logo.png" />
         </div>
-        <el-button type="info">退出</el-button>
+        <el-button type="info" @click="logout">退出</el-button>
       </el-header>
       <el-container>
         <el-aside :width="isCollapse ? '200px' : '64px'">
@@ -105,6 +105,18 @@ export default {
       const { data } = await getMenusAPI()
       // console.log(data)
       this.menuList = data
+    },
+    logout() {
+      this.$confirm('确认退出吗?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+      })
+        .then(() => {
+          this.$store.commit('removeToken')
+          this.$router.push('/login')
+        })
+        .catch(() => {})
     },
   },
 }
