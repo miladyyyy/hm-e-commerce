@@ -3,7 +3,8 @@ import store from '@/store'
 import { Message } from 'element-ui'
 
 const request = axios.create({
-  baseURL: 'http://weldon.net.cn:8889/api',
+  baseURL: 'https://lianghj.top:8888/api',
+  // baseURL: 'http://weldon.net.cn:8889/api',
   timeout: 5000,
 })
 

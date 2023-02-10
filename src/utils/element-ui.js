@@ -34,6 +34,8 @@ import {
   MenuItemGroup,
   Switch,
   Select,
+  Tag,
+  Tree,
 } from 'element-ui'
 
 Vue.use(Breadcrumb)
@@ -67,6 +69,8 @@ Vue.use(Image)
 Vue.use(Submenu)
 Vue.use(Switch)
 Vue.use(Select)
+Vue.use(Tag)
+Vue.use(Tree)
 
 Vue.use(Loading.directive)
 

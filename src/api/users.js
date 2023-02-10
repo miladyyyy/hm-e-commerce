@@ -16,10 +16,10 @@ export const searchUsersAPI = (params) => {
   })
 }
 
-export const changeState = (state) => {
+export const changeState = (val, id) => {
   return request({
     method: 'PUT',
-    url: `/private/v1/users/500/state/${state}`,
+    url: `/private/v1/users/${id} /state/${val}`,
   })
 }
 

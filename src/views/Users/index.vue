@@ -39,7 +39,10 @@
           <el-table-column prop="role_name" label="角色"> </el-table-column>
           <el-table-column prop="mg_state" label="状态" width="100">
             <template #default="{ row }">
-              <el-switch v-model="row.mg_state" @change="handleChange">
+              <el-switch
+                v-model="row.mg_state"
+                @change="handleChange($event, row.id)"
+              >
               </el-switch>
             </template>
           </el-table-column>
@@ -249,6 +252,7 @@ export default {
       this.initUserList()
     },
     handleClose() {
+      this.$refs.form.resetFields()
       this.dialogVisible = false
     },
 
@@ -268,9 +272,10 @@ export default {
       }
     },
 
-    async handleChange(newState) {
-      await changeState(newState)
+    async handleChange(val, id) {
+      await changeState(val, id)
       this.$message.success('更新状态成功')
+      this.initUserList()
     },
     async handleOpen(type, id, role_name, username) {
       this.currentType = type
