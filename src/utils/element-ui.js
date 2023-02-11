@@ -36,6 +36,11 @@ import {
   Select,
   Tag,
   Tree,
+  Alert,
+  Step,
+  Steps,
+  Tabs,
+  TabPane,
 } from 'element-ui'
 
 Vue.use(Breadcrumb)
@@ -71,6 +76,11 @@ Vue.use(Switch)
 Vue.use(Select)
 Vue.use(Tag)
 Vue.use(Tree)
+Vue.use(Alert)
+Vue.use(Step)
+Vue.use(Steps)
+Vue.use(Tabs)
+Vue.use(TabPane)
 
 Vue.use(Loading.directive)
 

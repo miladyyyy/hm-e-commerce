@@ -15,7 +15,12 @@
               class="main border-bottom"
             >
               <el-col class="col-1">
-                <el-tag closable>{{ item.authName }} </el-tag>
+                <el-tag
+                  closable
+                  :disable-transitions="false"
+                  @close="handleDeleteRights(row.id, item.id, row.children)"
+                  >{{ item.authName }}
+                </el-tag>
                 <i class="el-icon-caret-right"></i>
               </el-col>
               <el-col border>
@@ -24,13 +29,21 @@
                   :key="item2.id"
                   class="sub border-bottom"
                 >
-                  <el-tag type="success" closable>{{ item2.authName }} </el-tag>
+                  <el-tag
+                    type="success"
+                    closable
+                    @close="handleDeleteRights(row.id, item2.id, item.children)"
+                    >{{ item2.authName }}
+                  </el-tag>
                   <i class="el-icon-caret-right"></i>
                   <el-tag
                     type="warning"
                     v-for="item3 in item2.children"
                     :key="item3.id"
                     closable
+                    @close="
+                      handleDeleteRights(row.id, item3.id, item2.children)
+                    "
                   >
                     {{ item3.authName }}</el-tag
                   >
@@ -62,7 +75,7 @@
               size="small"
               type="warning"
               icon="el-icon-menu"
-              @click="handleOpen('allocate')"
+              @click="handleOpen('allocate', row)"
               >分配权限</el-button
             >
           </template>
@@ -78,6 +91,7 @@
     >
       <el-tree
         v-if="currentType === 'allocate'"
+        ref="tree"
         :data="tree"
         default-expand-all
         show-checkbox
@@ -93,11 +107,11 @@
         <el-form-item label="角色描述" prop="roleDesc" :rules="rules.roleDesc">
           <el-input v-model.trim="form.roleDesc"></el-input>
         </el-form-item>
-        <el-form-item class="dialog-button">
-          <el-button @click="handleClose">取消</el-button>
-          <el-button type="primary" @click="handleConfirm">确定</el-button>
-        </el-form-item>
       </el-form>
+      <div class="dialog-button">
+        <el-button @click="handleClose">取消</el-button>
+        <el-button type="primary" @click="handleConfirm">确定</el-button>
+      </div>
     </el-dialog>
   </div>
 </template>
@@ -108,6 +122,8 @@ import {
   editRolesAPI,
   deleteRolesAPI,
   getRolesTreeAPI,
+  assignPermissionsAPI,
+  deleteRightsAPI,
 } from '@/api/roles'
 
 export default {
@@ -174,7 +190,6 @@ export default {
       return index + 1
     },
     async handleOpen(type, row) {
-      this.dialogVisible = true
       this.currentType = type
       if (type === 'edit') {
         this.form.roleName = row.roleName
@@ -183,24 +198,27 @@ export default {
       }
       if (type === 'allocate') {
         const { data } = await getRolesTreeAPI()
-        console.log(data)
+        this.currentId = row.id
         this.tree = data
-        data.forEach((item) => {
+        row.children.forEach((item) => {
           item.children.forEach((item2) => {
-            this.idList.push(item2.id)
+            item2.children.forEach((item3) => {
+              this.idList.push(item3.id)
+            })
           })
         })
-        // console.log(this.idList)
       }
+      this.dialogVisible = true
     },
     handleClose() {
       if (this.currentType !== 'allocate') this.$refs.form.resetFields()
       this.dialogVisible = false
       this.currentType = null
       this.currentId = null
+      this.idList = []
     },
     async handleConfirm() {
-      await this.$refs.form.validate()
+      if (this.currentType !== 'allocate') await this.$refs.form.validate()
       switch (this.currentType) {
         case 'add':
           await addRolesAPI(this.form)
@@ -210,8 +228,17 @@ export default {
           await editRolesAPI(this.currentId, this.form)
           this.$message.success('修改成功')
           break
+        case 'allocate':
+          const rids = {
+            rids: this.$refs.tree
+              .getCheckedNodes()
+              .map((item) => item.id + ',' + item.pid)
+              .join(','),
+          }
+          await assignPermissionsAPI(this.currentId, rids)
+          this.$message.success('分配成功')
       }
-      this.$refs.form.resetFields()
+      if (this.currentType !== 'allocate') this.$refs.form.resetFields()
       this.initData()
       this.dialogVisible = false
     },
@@ -225,6 +252,22 @@ export default {
           await deleteRolesAPI(id)
           this.$message.success('删除成功')
           this.initData()
+        })
+        .catch(() => {
+          this.$message.info('已取消删除')
+        })
+    },
+
+    async handleDeleteRights(id, rid, pids) {
+      this.$confirm('此操作将删除该角色, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+      })
+        .then(async () => {
+          await deleteRightsAPI(id, rid)
+          pids.splice(pids.indexOf(id), 1)
+          this.$message.success('删除成功')
         })
         .catch(() => {
           this.$message.info('已取消删除')

@@ -36,3 +36,25 @@ export const getRolesTreeAPI = () => {
     url: '/private/v1/rights/tree',
   })
 }
+
+export const assignPermissionsAPI = (id, rids) => {
+  return request({
+    method: 'POST',
+    url: `/private/v1/roles/${id}/rights`,
+    data: rids,
+  })
+}
+
+export const deleteRightsAPI = (id, rid) => {
+  return request({
+    method: 'DELETE',
+    url: `/private/v1/roles/${id} /rights/${rid}`,
+  })
+}
+
+export const getRightsAPI = () => {
+  return request({
+    method: 'GET',
+    url: '/private/v1/rights/list',
+  })
+}

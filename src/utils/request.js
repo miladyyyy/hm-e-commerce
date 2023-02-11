@@ -21,7 +21,7 @@ request.interceptors.response.use(
   function (response) {
     if (response.data.meta.status === 200) return response.data
 
-    if (response.data.meta.status === 400) {
+    if (response.data.meta.status !== 200) {
       Message.error(response.data.meta.msg)
       return Promise.reject()
     }
