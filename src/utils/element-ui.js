@@ -41,6 +41,7 @@ import {
   Steps,
   Tabs,
   TabPane,
+  Cascader,
 } from 'element-ui'
 
 Vue.use(Breadcrumb)
@@ -81,6 +82,7 @@ Vue.use(Step)
 Vue.use(Steps)
 Vue.use(Tabs)
 Vue.use(TabPane)
+Vue.use(Cascader)
 
 Vue.use(Loading.directive)
 

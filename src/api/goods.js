@@ -14,3 +14,42 @@ export const searchGoodsAPI = (params) => {
     params,
   })
 }
+
+export const getCategoriesAPI = (params) => {
+  return request({
+    method: 'GET',
+    url: '/private/v1/categories',
+    params,
+  })
+}
+
+export const getAttributesAPI = (type) => {
+  return request({
+    method: 'GET',
+    url: '/private/v1/categories/114/attributes',
+    params: { sel: type },
+  })
+}
+
+export const getParamsAPI = (id, type) => {
+  return request({
+    method: 'GET',
+    url: `/private/v1/categories/${id}/attributes`,
+    params: { sel: type },
+  })
+}
+
+export const addAttributesAPI = (id, data) => {
+  return request({
+    method: 'POST',
+    url: `private/v1/categories/${id} /attributes`,
+    data,
+  })
+}
+
+export const editAttributesAPI = (id, aid) => {
+  return request({
+    method: 'PUT',
+    url: `/private/v1/categories/${id}/attributes/${aid}`,
+  })
+}
