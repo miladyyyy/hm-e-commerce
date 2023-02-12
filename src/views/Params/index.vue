@@ -23,14 +23,19 @@
       </el-row>
 
       <template>
-        <el-tabs v-model="activeName" @tab-click="handleClick">
-          <el-button type="primary" size="small" @click="handleOpen('add')"
-            >添加动态参数</el-button
+        <el-tabs v-model="currentTab" @tab-click="handleClick">
+          <el-button
+            class="add-btn"
+            type="primary"
+            size="small"
+            @click="handleOpen('add')"
+            :disabled="!currentId"
+            >添加{{ ipt_label }}</el-button
           >
-          <el-tab-pane label="动态参数" name="first">
+          <el-tab-pane label="动态参数" name="0">
             <ParamsTable :tableData="paramsList" />
           </el-tab-pane>
-          <el-tab-pane label="静态属性" name="second">配置管理</el-tab-pane>
+          <el-tab-pane label="静态属性" name="1">配置管理</el-tab-pane>
         </el-tabs>
       </template>
     </el-card>
@@ -39,7 +44,7 @@
       <el-form :model="form" ref="form" label-width="100px">
         <el-form-item
           prop="attr"
-          label="'参数'"
+          :label="ipt_label"
           :rules="[{ required: true, message: '请输入参数' }]"
         >
           <el-input v-model="form.attr"></el-input>
@@ -69,8 +74,7 @@ export default {
   components: { ParamsTable },
   data() {
     return {
-      activeName: 0,
-      currentTab: 0,
+      currentTab: '0',
       currentId: null,
       secectedCate: '',
       paramsList: [],
@@ -83,12 +87,19 @@ export default {
   },
   computed: {
     ...mapState('goods', ['categories']),
+    ipt_label() {
+      if (this.currentTab === '0') return '动态参数'
+      else return '静态参数'
+    },
   },
   methods: {
     ...mapActions('goods', ['getCategoriesAction']),
     async getParams(ids) {
-      if (!this.currentId) this.currentId = ids.at(-1)
-      const { data } = await getParamsAPI(this.currentId, 'many')
+      this.currentId = ids.at(-1)
+      const { data } = await getParamsAPI(
+        this.currentId,
+        selMap[this.currentTab]
+      )
       this.paramsList = data
     },
 
@@ -99,10 +110,17 @@ export default {
     },
 
     async handleConfirm() {
+      await this.$refs.form.validate()
       await addAttributesAPI(this.currentId, {
         attr_name: this.form.attr,
         attr_sel: selMap[this.currentTab],
       })
+      const { data } = await getParamsAPI(
+        this.currentId,
+        selMap[this.currentTab]
+      )
+      this.paramsList = data
+
       this.$message.success('添加成功')
       this.dialogVisible = false
     },
@@ -112,5 +130,9 @@ export default {
 <style lang="scss" scoped>
 .row-1 {
   margin: 20px 0;
+}
+
+.add-btn {
+  margin-bottom: 20px;
 }
 </style>
