@@ -29,7 +29,7 @@
         </el-table-column>
         <el-table-column prop="goods_price" label="商品价格" width="180">
         </el-table-column>
-        <el-table-column prop="goods_weight" label="商品重置">
+        <el-table-column prop="goods_weight" label="商品重量">
         </el-table-column>
         <el-table-column prop="add_time" label="创建时间"> </el-table-column>
         <el-table-column label="操作" width="200">
@@ -71,7 +71,6 @@ export default {
       })
       this.goodsList = data.goods
       this.total = data.total
-      console.log(data)
     },
 
     async handleSearch() {

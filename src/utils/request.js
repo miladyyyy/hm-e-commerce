@@ -19,9 +19,9 @@ request.interceptors.request.use(function (config) {
 //响应拦截器
 request.interceptors.response.use(
   function (response) {
-    if (response.data.meta.status === 200) return response.data
+    if (~~(response.data.meta.status / 100) === 2) return response.data
 
-    if (response.data.meta.status !== 200) {
+    if (~~(response.data.meta.status / 100) === 4) {
       Message.error(response.data.meta.msg)
       return Promise.reject()
     }

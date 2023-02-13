@@ -33,9 +33,20 @@
             >添加{{ ipt_label }}</el-button
           >
           <el-tab-pane label="动态参数" name="0">
-            <ParamsTable :tableData="paramsList" />
+            <ParamsTable
+              :tableData="paramsList"
+              :id="currentId"
+              :sel="selType"
+              @initData="initData"
+            />
           </el-tab-pane>
-          <el-tab-pane label="静态属性" name="1">配置管理</el-tab-pane>
+          <el-tab-pane label="静态属性" name="1"
+            ><ParamsTable
+              :tableData="paramsList"
+              :id="currentId"
+              :sel="selType"
+              @initData="initData"
+          /></el-tab-pane>
         </el-tabs>
       </template>
     </el-card>
@@ -52,7 +63,7 @@
       </el-form>
       <template #footer>
         <span class="dialog-footer">
-          <el-button @click="dialogVisible = false">取 消</el-button>
+          <el-button @click="handleClose">取 消</el-button>
           <el-button type="primary" @click="handleConfirm">确 定</el-button>
         </span>
       </template>
@@ -66,7 +77,7 @@ import ParamsTable from './components/ParamsTable.vue'
 
 const selMap = {
   0: 'many',
-  1: 'onlt',
+  1: 'only',
 }
 
 export default {
@@ -91,11 +102,16 @@ export default {
       if (this.currentTab === '0') return '动态参数'
       else return '静态参数'
     },
+
+    selType() {
+      if (this.currentTab === '0') return 'many'
+      else if (this.currentTab === '1') return 'only'
+    },
   },
   methods: {
     ...mapActions('goods', ['getCategoriesAction']),
-    async getParams(ids) {
-      this.currentId = ids.at(-1)
+    async initData() {
+      if (!this.currentId) return
       const { data } = await getParamsAPI(
         this.currentId,
         selMap[this.currentTab]
@@ -103,7 +119,15 @@ export default {
       this.paramsList = data
     },
 
-    handleClick() {},
+    async getParams(ids) {
+      this.currentId = ids.at(-1)
+      this.initData()
+    },
+
+    async handleClick(tab) {
+      this.currentTab = tab.name
+      this.initData()
+    },
 
     handleOpen() {
       this.dialogVisible = true
@@ -122,6 +146,12 @@ export default {
       this.paramsList = data
 
       this.$message.success('添加成功')
+      this.$refs.form.resetFields()
+      this.dialogVisible = false
+    },
+
+    handleClose() {
+      this.$refs.form.resetFields()
       this.dialogVisible = false
     },
   },

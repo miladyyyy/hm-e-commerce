@@ -47,9 +47,32 @@ export const addAttributesAPI = (id, data) => {
   })
 }
 
-export const editAttributesAPI = (id, aid) => {
+export const editAttributesAPI = (id, aid, data) => {
   return request({
     method: 'PUT',
     url: `/private/v1/categories/${id}/attributes/${aid}`,
+    data,
+  })
+}
+
+export const deleteAttributesAPI = (id, aid) => {
+  return request({
+    method: 'DELETE',
+    url: `/private/v1/categories/${id}/attributes/${aid}`,
+  })
+}
+
+export const getCategoriesListAPI = (params) => {
+  return request({
+    method: 'GET',
+    url: '/private/v1/categories',
+    params,
+  })
+}
+
+export const deleteCategoryAPI = (id) => {
+  return request({
+    method: 'DELETE',
+    url: `/private/v1/categories/${id}`,
   })
 }
