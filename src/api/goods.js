@@ -76,3 +76,33 @@ export const deleteCategoryAPI = (id) => {
     url: `/private/v1/categories/${id}`,
   })
 }
+
+export const getOptionsAPI = (type) => {
+  return request({
+    method: 'GET',
+    url: `/private/v1/categories?type=${type}`,
+  })
+}
+
+export const addCategoryAPI = (data) => {
+  return request({
+    method: 'POST',
+    url: '/private/v1/categories',
+    data,
+  })
+}
+
+export const getCategoryAPI = (id) => {
+  return request({
+    method: 'GET',
+    url: `/private/v1/categories/${id}`,
+  })
+}
+
+export const editCategoryAPI = (id, data) => {
+  return request({
+    method: 'PUT',
+    url: `/private/v1/categories/${id}`,
+    data,
+  })
+}

@@ -37,7 +37,11 @@
         </template>
 
         <template #operate="{ row }">
-          <el-button size="mini" type="primary" icon="el-icon-edit"
+          <el-button
+            size="mini"
+            type="primary"
+            icon="el-icon-edit"
+            @click="handleOpen('edit', row.cat_id)"
             >编辑</el-button
           >
           <el-button
@@ -62,17 +66,61 @@
       </el-pagination>
     </el-card>
 
-    <el-dialog title="dialogTitle" :visible.sync="dialogVisible">
-      <el-form :model="form">
-        <el-form-item prop="cate_name" label="分类名称">
+    <el-dialog
+      :title="dialogTitle"
+      :visible.sync="dialogVisible"
+      @close="handleClose"
+    >
+      <el-form :model="form" ref="form" label-width="100px">
+        <el-form-item
+          prop="cate_name"
+          label="分类名称"
+          :rules="[
+            {
+              required: true,
+              message: '请输入分类名称',
+              trigger: ['blur'],
+            },
+          ]"
+        >
           <el-input v-model="form.cate_name"></el-input>
         </el-form-item>
+        <el-form-item
+          prop="pCate"
+          label="父级分类"
+          v-if="currentType === 'add'"
+        >
+          <el-cascader
+            style="width: 100%"
+            v-model="form.pCate"
+            :options="options"
+            :props="{
+              expandTrigger: 'hover',
+              label: 'cat_name',
+              value: 'cat_id',
+              checkStrictly: true,
+            }"
+            @change="handleChange"
+            clearable
+          ></el-cascader>
+        </el-form-item>
+        <el-row type="flex" justify="end">
+          <el-button @click="handleClose">取消</el-button>
+          <el-button type="primary" @click="handleConfirm">确认</el-button>
+        </el-row>
       </el-form>
     </el-dialog>
   </div>
 </template>
 <script>
-import { getCategoriesListAPI, deleteCategoryAPI } from '@/api/goods'
+import {
+  getCategoriesListAPI,
+  deleteCategoryAPI,
+  addCategoryAPI,
+  getOptionsAPI,
+  getCategoryAPI,
+  editCategoryAPI,
+} from '@/api/goods'
 
 export default {
   name: 'CategoriesPage',
@@ -110,18 +158,26 @@ export default {
       },
       loading: false,
       currentType: null,
+      currentId: null,
       dialogVisible: false,
       form: {
         cate_name: '',
         pCate: null,
+      },
+      options: [],
+      payload: {
+        cat_level: 0,
+        cat_name: '一级',
+        cat_pid: 0,
       },
     }
   },
 
   computed: {
     dialogTitle() {
-      if (currentType === 'add') return '添加分类'
-      else return '编辑分类'
+      if (this.currentType === 'add' || this.currentType === 'edit')
+        return this.currentType
+      else return ''
     },
   },
 
@@ -141,6 +197,10 @@ export default {
         this.loading = false
       }
     },
+    async initOptions() {
+      const { data } = await getOptionsAPI(2)
+      this.options = data
+    },
 
     handleSizeChange(newSize) {
       this.params.pagesize = newSize
@@ -158,8 +218,69 @@ export default {
       this.initData()
     },
 
-    handleOpen(type) {
+    async handleOpen(type, id) {
       this.dialogVisible = true
+      this.currentType = type
+      switch (type) {
+        case 'add':
+          this.initOptions()
+          break
+        case 'edit':
+          const { data } = await getCategoryAPI(id)
+          this.form.cate_name = data.cat_name
+          this.currentId = id
+          break
+      }
+    },
+    handleClose() {
+      this.$refs.form.resetFields()
+      this.dialogVisible = false
+      this.currentType = null
+    },
+
+    handleChange(val) {
+      switch (val.length) {
+        case 0:
+          this.payload = {
+            cat_level: 0,
+            cat_name: this.form.cate_name,
+            cat_pid: 0,
+          }
+          break
+        case 1:
+          this.payload = {
+            cat_level: 1,
+            cat_name: this.form.cate_name,
+            cat_pid: val[0],
+          }
+          break
+        case 3:
+          this.payload = {
+            cat_level: 2,
+            cat_name: this.form.cate_name,
+            cat_pid: val[1],
+          }
+          break
+      }
+    },
+
+    async handleConfirm() {
+      await this.$refs.form.validate()
+      switch (this.currentType) {
+        case 'add':
+          ;(this.payload.cat_name = this.form.cate_name),
+            await addCategoryAPI(this.payload)
+          this.$message.success('添加成功')
+          break
+        case 'edit':
+          await editCategoryAPI(this.currentId, {
+            cat_name: this.form.cate_name,
+          })
+          this.$message.success('修改成功')
+          break
+      }
+      this.handleClose()
+      this.initData()
     },
   },
 }
