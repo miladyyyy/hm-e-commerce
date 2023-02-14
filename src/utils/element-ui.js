@@ -42,6 +42,11 @@ import {
   Tabs,
   TabPane,
   Cascader,
+  Radio,
+  Timeline,
+  TimelineItem,
+  Checkbox,
+  CheckboxGroup,
 } from 'element-ui'
 
 Vue.use(Breadcrumb)
@@ -83,6 +88,11 @@ Vue.use(Steps)
 Vue.use(Tabs)
 Vue.use(TabPane)
 Vue.use(Cascader)
+Vue.use(Radio)
+Vue.use(Timeline)
+Vue.use(TimelineItem)
+Vue.use(Checkbox)
+Vue.use(CheckboxGroup)
 
 Vue.use(Loading.directive)
 

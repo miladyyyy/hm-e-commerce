@@ -31,7 +31,11 @@
         </el-table-column>
         <el-table-column prop="goods_weight" label="商品重量">
         </el-table-column>
-        <el-table-column prop="add_time" label="创建时间"> </el-table-column>
+        <el-table-column label="创建时间">
+          <template #default="{ row }">
+            {{ row.add_time | timeFormat }}
+          </template>
+        </el-table-column>
         <el-table-column label="操作" width="200">
           <template #default="{ row }">
             <el-button type="primary" size="small" icon="el-icon-edit"

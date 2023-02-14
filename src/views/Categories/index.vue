@@ -175,9 +175,10 @@ export default {
 
   computed: {
     dialogTitle() {
-      if (this.currentType === 'add' || this.currentType === 'edit')
-        return this.currentType
-      else return ''
+      if (this.currentType) {
+        return this.currentType === 'add' ? '添加分类' : '编辑分类'
+      }
+      return ''
     },
   },
 
