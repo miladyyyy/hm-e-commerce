@@ -18,7 +18,7 @@
         <el-step title="完成"></el-step>
       </el-steps>
 
-      <el-form class="add-form">
+      <el-form class="add-form" ref="infoForm">
         <el-tabs
           v-model="active"
           tab-position="left"
@@ -85,20 +85,50 @@
                   :label="cb"
                   v-for="(cb, index) in item.attr_vals"
                   :key="index"
+                  border
                 ></el-checkbox>
               </el-checkbox-group>
             </el-form-item>
           </el-tab-pane>
           <el-tab-pane label="商品属性" name="2"></el-tab-pane>
-          <el-tab-pane label="商品图片" name="3"></el-tab-pane>
-          <el-tab-pane label="商品内容" name="4"></el-tab-pane>
+          <el-tab-pane label="商品图片" name="3">
+            <el-upload
+              :action="uploadURL"
+              :on-preview="handlePreview"
+              :on-remove="handleRemove"
+              :on-success="handleSuccess"
+              listType="pitcure"
+              :headers="headerObj"
+            >
+              <el-button size="samll" type="primary" style="margin-top: 20px"
+                >点击上传</el-button
+              >
+            </el-upload>
+          </el-tab-pane>
+          <el-tab-pane label="商品内容" name="4">
+            <quillEditor
+              class="ql-editor"
+              v-model="infoForm.goods_content"
+            ></quillEditor>
+            <el-button type="primary" @click="handleAdd">添加商品</el-button>
+          </el-tab-pane>
         </el-tabs>
       </el-form>
     </el-card>
+
+    <el-dialog title="图片预览" :visible.sync="previewVisble">
+      <img :src="previewPath" style="width: 100%"
+    /></el-dialog>
   </div>
 </template>
 <script>
 import { getCategoriesAPI, getParamsAPI } from '@/api/goods'
+
+import 'quill/dist/quill.core.css'
+import 'quill/dist/quill.snow.css'
+import 'quill/dist/quill.bubble.css'
+
+import { quillEditor } from 'vue-quill-editor'
 // import GoodsInfo from './components/GoodsInfo.vue'
 // import GoodsParams from './components/GoodsParams.vue'
 // import GoodsProperty from './components/GoodsProperty.vue'
@@ -115,13 +145,9 @@ import { getCategoriesAPI, getParamsAPI } from '@/api/goods'
 
 export default {
   name: 'AddPage',
-  // components: {
-  //   GoodsInfo,
-  //   GoodsParams,
-  //   GoodsProperty,
-  //   GoodsImage,
-  //   GoodsContent,
-  // },
+  components: {
+    quillEditor,
+  },
   data() {
     return {
       active: 0,
@@ -131,6 +157,9 @@ export default {
         goods_number: '',
         goods_weight: '',
         goods_category: [],
+        pics: [],
+        goods_content: '',
+        attrs: [],
       },
       rules: {
         goods_name: [
@@ -151,6 +180,12 @@ export default {
       },
       Categories: [],
       manyTableDate: [],
+      uploadURL: 'https://lianghj.top:8888/api/private/v1/upload',
+      headerObj: {
+        Authorization: this.$store.state.user.token,
+      },
+      previewPath: '',
+      previewVisble: false,
     }
   },
 
@@ -195,11 +230,48 @@ export default {
         return false
       }
     },
+
+    handlePreview(file) {
+      this.previewPath = file.response.data.url
+      this.previewVisble = true
+    },
+
+    handleRemove(file) {
+      const filePath = file.response.data.tmp_path
+      const i = this.infoForm.pics.findIndex((item) => item.pic === filePath)
+      this.infoForm.pics.splice(i, 1)
+    },
+
+    handleSuccess(res) {
+      this.infoForm.pics.push(res.data.tmp_path)
+    },
+
+    async handleAdd() {
+      await this.$refs.infoForm.validate()
+      const form = structuredClone(this.infoForm)
+      form.good_cat = form.good_cat.join(',')
+
+      this.manyTableDate.forEach((item) => {
+        const newInfo = {
+          attr_id: item.attr_id,
+          attr_value: item.attr_vals.join(' '),
+        }
+        this.infoForm.attrs.push(newInfo)
+      })
+    },
   },
 }
 </script>
 <style lang="scss" scoped>
 .step {
   margin: 15px 0;
+}
+
+::v-deep .el-checkbox {
+  margin: 0 10px 0 0;
+}
+
+::v-deep .ql-editor {
+  min-height: 200px;
 }
 </style>

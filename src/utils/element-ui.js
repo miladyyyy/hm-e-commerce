@@ -47,6 +47,7 @@ import {
   TimelineItem,
   Checkbox,
   CheckboxGroup,
+  Upload,
 } from 'element-ui'
 
 Vue.use(Breadcrumb)
@@ -93,6 +94,7 @@ Vue.use(Timeline)
 Vue.use(TimelineItem)
 Vue.use(Checkbox)
 Vue.use(CheckboxGroup)
+Vue.use(Upload)
 
 Vue.use(Loading.directive)
 
